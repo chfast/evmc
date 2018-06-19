@@ -701,15 +701,17 @@ struct evmc_tracer_context;
  *
  * @param context                The pointer to the Client-side tracing context. This allows to
  *                               implement the tracer in OOP manner.
- * @param step                   The instruction counter for the current message.
- * @param code_offset            The instruction possition in the code.
+ * @param step                   The instruction counter: number of instructions executed.
+ *                               This counter starts from 0 for every message passed to
+ *                               ::evmc_execute_fn.
+ * @param code_offset            The current instruction position in the code.
  * @param status_code            The status code of the instruction execution.
  * @param gas_left               The amount of the gas left after the instruction execution.
- * @param stack_num_items        The current EVM stack height.
+ * @param stack_num_items        The current EVM stack height after the instruction execution.
  * @param pushed_stack_item      The top EVM stack item pushed as the result of the instruction
  *                               execution. This value is null when the instruction does not push
  *                               anything to the stack.
- * @param memory_size            The current size of the EVM memory.
+ * @param memory_size            The size of the EVM memory after the instruction execution.
  * @param changed_memory_offset  The beginning of the memory area modified as the result of
  *                               the instruction execution.
  * @param changed_memory_size    The size of the memory area modified as the result of
