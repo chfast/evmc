@@ -666,18 +666,18 @@ enum evmc_revision
 
 
 /**
- * Generates and executes machine code for given EVM bytecode.
+ * Executes the given EVM bytecode using the input in the message
  *
- *  All the fun is here. This function actually does something useful.
+ * This function MAY be invoked multiple times for a single EVM instance.
  *
- *  @param instance    A EVM instance.
- *  @param context     The pointer to the Host execution context to be passed
- *                     to callback functions. @see ::evmc_context.
- *  @param rev         Requested EVM specification revision.
- *  @param msg         Call parameters. @see ::evmc_message.
- *  @param code        Reference to the bytecode to be executed.
- *  @param code_size   The length of the bytecode.
- *  @return            All execution results.
+ * @param instance   The EVM instance.
+ * @param context    The pointer to the Client execution context to be passed
+ *                   to the callback functions. @see ::evmc_context.
+ * @param rev        Requested EVM specification revision.
+ * @param msg        Call parameters. @see ::evmc_message.
+ * @param code       Reference to the bytecode to be executed.
+ * @param code_size  The length of the bytecode.
+ * @return           All execution results.
  */
 typedef struct evmc_result (*evmc_execute_fn)(struct evmc_instance* instance,
                                               struct evmc_context* context,
@@ -694,7 +694,7 @@ struct evmc_tracer_context;
  * The callback to trace instructions execution in an EVM.
  *
  * This function informs the Client what instruction has been executed in the EVM implementation
- * and what are the results of the execution this particular instruction.
+ * and what are the results of executing this particular instruction.
  * The message level information (like call depth, destination address, etc.) are not provided here.
  * This piece of information can be acquired by inspecting messages being sent to the EVM in
  * ::evmc_execute_fn and the results of the messages execution.
@@ -734,13 +734,18 @@ typedef void (*evmc_trace_callback)(struct evmc_tracer_context* context,
 /**
  * Sets the EVM instruction tracer.
  *
- * When the tracer is set in the EVM instance, the EVM SHOULD callback the tracer with information
+ * When the tracer is set in the EVM instance, the EVM SHOULD call back the tracer with information
  * about instructions execution in the EVM.
  * @see ::evmc_trace_callback.
  *
+ * This will overwrite the previous settings (the callback and the context).
+ *
  * @param instance    The EVM instance.
- * @param callback    The tracer callback function.
- * @param context     The Client-side tracer context.
+ * @param callback    The tracer callback function. This argument MAY be NULL to disable previously
+ *                    set tracer.
+ * @param context     The Client-side tracer context. This argument MAY be NULL in case the tracer
+ *                    does not require any context. This argument MUST be NULL if the callback
+ *                    argument is NULL.
  */
 typedef void (*evmc_set_tracer_fn)(struct evmc_instance* instance,
                                    evmc_trace_callback callback,
